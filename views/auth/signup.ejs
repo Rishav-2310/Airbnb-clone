@@ -1,0 +1,85 @@
+<%- include('../partials/head') %>
+
+</head>
+<body class="bg-gray-50">
+    <%- include('../partials/nav') %>
+
+    <main class="flex justify-center items-start py-16 px-4">
+        <div class="bg-white rounded-xl shadow-md w-full max-w-xl overflow-hidden">
+            <div class="bg-linear-to-r from-red-500 to-red-400 p-6">
+                <h1 class="text-white text-2xl md:text-3xl font-semibold">Create your account</h1>
+                <p class="text-red-100 mt-1">Join to book stays or list your property</p>
+            </div>
+
+            <div class="p-8">
+                <form action="/signup" method="POST" class="space-y-4" novalidate>
+                    <%- include('../partials/errors') %>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="firstName" class="block text-sm font-medium text-gray-700">First name</label>
+                            <input name="firstName" type="text" value="<%= oldInput.firstName ? oldInput.firstName : '' %>" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-400 focus:ring-red-200 focus:ring-opacity-50 p-2" placeholder="John">
+                        </div>
+
+                        <div>
+                            <label for="lastName" class="block text-sm font-medium text-gray-700">Last name</label>
+                            <input name="lastName" type="text" value="<%= oldInput.lastName ? oldInput.lastName : '' %>" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-400 focus:ring-red-200 focus:ring-opacity-50 p-2" placeholder="Doe">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input name="email" type="email" value="<%= oldInput.email ? oldInput.email : '' %>" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-400 focus:ring-red-200 focus:ring-opacity-50 p-2" placeholder="you@example.com">
+                        <p class="text-xs text-gray-500 mt-1">We'll never share your email.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                            <input name="password" type="password" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-400 focus:ring-red-200 focus:ring-opacity-50 p-2" placeholder="At least 8 characters">
+                        </div>
+
+                        <div>
+                            <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Confirm password</label>
+                            <input name="confirmPassword" type="password" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-400 focus:ring-red-200 focus:ring-opacity-50 p-2" placeholder="Repeat password">
+                        </div>
+                    </div>
+
+                    <div class="text-sm text-red-600 sr-only" aria-live="polite"></div>
+
+                    <fieldset class="mt-1">
+                        <legend class="text-sm font-medium text-gray-700">User type</legend>
+                        <div class="mt-2 flex items-center gap-6">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="userType" value="guest" class="form-radio text-red-500" <%= oldInput.userType === 'guest' || !oldInput.userType ? 'checked' : '' %>>
+                                <span class="ml-2 text-gray-700">Guest</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="userType" value="host" class="form-radio text-red-500" <%= oldInput.userType === 'host' ? 'checked' : '' %>>
+                                <span class="ml-2 text-gray-700">Host</span>
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <div class="mt-4">
+                        <label class="flex items-start">
+                            <input type="checkbox" name="terms" class="mt-1 form-checkbox text-red-500">
+                            <span class="ml-3 text-sm text-gray-700">I agree to the <a href="#" class="text-red-500 underline">terms and conditions</a></span>
+                        </label>
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit" class="w-full inline-flex justify-center items-center gap-2 rounded-md bg-red-500 px-4 py-2 text-white font-semibold hover:bg-red-400 focus:outline-none focus:ring-2 focus:ring-red-200 disabled:opacity-50" >
+                            Register
+                        </button>
+                    </div>
+                    
+                    <div class="text-center text-sm text-gray-600 mt-2">
+                        I already have an account? <a href="/login" class="text-red-500 font-medium hover:underline">Sign in</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    </body>
+    </html>

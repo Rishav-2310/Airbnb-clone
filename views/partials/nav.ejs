@@ -1,0 +1,47 @@
+<header class="bg-white shadow">
+    <nav class="container mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
+        <!-- Brand -->
+        <div class="flex items-center space-x-3">
+            <a href="/" class="inline-flex items-center space-x-2">
+                <span class="inline-block w-8 h-8 rounded-md bg-red-500 items-center justify-center text-white font-bold">A</span>
+                <span class="text-xl font-semibold text-gray-800">airbnb</span>
+            </a>
+        </div>
+
+        <!-- Links (desktop) -->
+        <ul class="hidden md:flex items-center space-x-2">
+            <% if (isLoggedIn) { %>
+                <% if (user && user.userType === 'guest') { %>
+                    <li>
+                        <a href="/homes" class="px-4 py-2 rounded-md transition <%= (currentPage === 'home' || currentPage === 'index') ? 'bg-red-500 text-white' : 'text-gray-700 hover:bg-gray-100' %>">Home List</a>
+                    </li>
+                    <li>
+                        <a href="/bookings" class="px-4 py-2 rounded-md transition <%= currentPage === 'bookings' ? 'bg-red-500 text-white' : 'text-gray-700 hover:bg-gray-100' %>">Bookings</a>
+                    </li>
+                    <li>
+                        <a href="/favourite-list" class="px-4 py-2 rounded-md transition <%= (currentPage === 'favourite-list' || currentPage === 'favourites') ? 'bg-red-500 text-white' : 'text-gray-700 hover:bg-gray-100' %>">Favourites</a>
+                    </li>
+                <% } else { %>
+                    <li>
+                        <a href="/host/host-home-list" class="px-4 py-2 rounded-md transition <%= currentPage === 'host-homes' ? 'bg-red-500 text-white' : 'text-gray-700 hover:bg-gray-100' %>">Host Home</a>
+                    </li>
+                    <li>
+                        <a href="/host/add-home" class="px-4 py-2 rounded-md transition <%= currentPage === 'addHome' ? 'bg-red-500 text-white' : 'text-gray-700 hover:bg-gray-100' %>">Add Home</a>
+                    </li>
+                <% } %>
+            <% } %>
+        </ul>
+
+        <!-- Actions -->
+        <div class="flex items-center space-x-3">
+            <% if (!isLoggedIn) { %>
+                <a href="/signup" class="hidden md:inline-block px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-400">Sign up</a>
+                <a href="/login" class="inline-block px-4 py-2 rounded-md border border-red-500 text-red-500 hover:bg-red-50">Log in</a>
+            <% } else { %>
+                <form action="/logout" method="POST" class="inline-block">
+                    <button type="submit" class="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-400">Logout</button>
+                </form>
+            <% } %>
+        </div>
+    </nav>
+</header>

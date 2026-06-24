@@ -1,0 +1,40 @@
+<%- include('../partials/head') %>
+
+</head>
+<body class="bg-gray-50">
+    <%- include('../partials/nav') %>
+
+    <main class="flex justify-center items-start py-16 px-4">
+        <div class="bg-white rounded-xl shadow-md w-full max-w-md overflow-hidden">
+            <div class="bg-linear-to-r from-red-500 to-red-400 p-6">
+                <h1 class="text-white text-2xl font-semibold">Welcome back</h1>
+                <p class="text-red-100 mt-1">Sign in to continue to your account</p>
+            </div>
+
+            <div class="p-8">
+                <form action="/login" method="POST" class="space-y-4">
+                    <%- include('../partials/errors') %>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Email</label>
+                        <input name="email" type="email" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-400 focus:ring-red-200 p-2" placeholder="you@example.com" value="<%= oldInput.email ? oldInput.email : '' %>">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Password</label>
+                        <input name="password" type="password" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-400 focus:ring-red-200 p-2" placeholder="Enter your password">
+                    </div>
+
+                    <div>
+                        <button type="submit" class="w-full inline-flex justify-center items-center gap-2 rounded-md bg-red-500 px-4 py-2 text-white font-semibold hover:bg-red-400 focus:outline-none focus:ring-2 focus:ring-red-200">Sign in</button>
+                    </div>
+                    
+                    <div class="text-center text-sm text-gray-600 mt-2">
+                        I don't have an account? <a href="/signup" class="text-red-500 font-medium hover:underline">Sign up</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
