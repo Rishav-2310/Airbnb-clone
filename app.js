@@ -33,22 +33,22 @@ const randomString= (length) => {
     return result;
 }
 
-const uploadStorage= multer.diskStorage({
-    destination: (req, file, cb) => {
-        if (file.fieldname === 'rules') {
-            cb(null, 'rules/');
-        } else {
-            cb(null, 'uploads/');
-        }
-    },
-    filename: (req, file, cb) => {
-        if (file.fieldname === 'rules') {
-            cb(null, `rules-${randomString(10)}.pdf`);
-        } else {
-            cb(null, randomString(10) + '-' + file.originalname);
-        }
-    }
-});
+// const uploadStorage= multer.diskStorage({
+//     destination: (req, file, cb) => {
+//         if (file.fieldname === 'rules') {
+//             cb(null, 'rules/');
+//         } else {
+//             cb(null, 'uploads/');
+//         }
+//     },
+//     filename: (req, file, cb) => {
+//         if (file.fieldname === 'rules') {
+//             cb(null, `rules-${randomString(10)}.pdf`);
+//         } else {
+//             cb(null, randomString(10) + '-' + file.originalname);
+//         }
+//     }
+// });
 
 const uploadFileFilter = (req, file, cb) => {
     if (file.fieldname === 'photo') {
@@ -69,7 +69,8 @@ const uploadFileFilter = (req, file, cb) => {
 };
 
 const upload = multer({
-    storage: uploadStorage,
+    // storage: uploadStorage,
+    storage: multer.memoryStorage(),
     fileFilter: uploadFileFilter
 }).fields([
     { name: 'photo', maxCount: 1 },
@@ -79,6 +80,22 @@ const upload = multer({
 app.use(express.urlencoded({extended: true}));  // It helps to read input data...
 app.use(upload);  // It helps to read photo and rules data...
 app.use(express.static(path.join(rootDir, 'public')));  // It helps to use css file and make folder public...
+
+// Serve photos from MongoDB database if stored there, otherwise fall back to local disk files
+const servePhoto = (req, res, next) => {
+    const dbPath = 'uploads/' + req.params.filename;
+    mongoose.model('Home').findOne({ photo: dbPath }).then(home => {
+        if (home && home.photoBuffer) {
+            res.setHeader('Content-Type', home.photoMimeType || 'image/jpeg');
+            return res.send(home.photoBuffer);
+        }
+        next();
+    }).catch(err => next());
+};
+app.get('/uploads/:filename', servePhoto);
+app.get('/host/uploads/:filename', servePhoto);
+app.get('/homes/uploads/:filename', servePhoto);
+
 app.use('/uploads', express.static(path.join(rootDir, 'uploads')));  // It helps to use uploaded images and make folder public...
 app.use('/host/uploads', express.static(path.join(rootDir, 'uploads')));
 app.use('/homes/uploads', express.static(path.join(rootDir, 'uploads')));

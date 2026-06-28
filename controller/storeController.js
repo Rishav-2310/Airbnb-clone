@@ -101,7 +101,21 @@ exports.getHouseRules= [(req, res, next) => {
 (req, res, next) => {
     const homeId= req.params.homeId;
     Home.findById(homeId).then(home => {
-        if (!home || !home.rules) {
+        // if (!home || !home.rules) {
+        if (!home) {
+            console.log("Home not found");
+            return res.redirect('/homes');
+        }
+        
+        // If rules buffer exists in DB, serve/download from buffer
+        if (home.rulesBuffer) {
+            res.setHeader('Content-Type', home.rulesMimeType || 'application/pdf');
+            res.setHeader('Content-Disposition', `attachment; filename="${home.houseName} Rules.pdf"`);
+            return res.send(home.rulesBuffer);
+        }
+        
+        // Otherwise, fall back to local disk files
+        if (!home.rules) {
             console.log("Home or rules not found");
             return res.redirect(`/homes/${homeId}`);
         }

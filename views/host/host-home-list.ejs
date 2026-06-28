@@ -24,7 +24,7 @@
                 <% registeredHomes.forEach(home => { %>
                     <article class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition">
                         <div class="h-48 bg-gray-200 overflow-hidden">
-                            <img src="<%= home.photo %>" alt="<%= home.houseName %>" class="w-full h-full object-cover">
+                            <img src="/<%= home.photo %>" alt="<%= home.houseName %>" class="w-full h-full object-cover">
                         </div>
                         <div class="p-4">
                             <div class="flex items-start justify-between">
@@ -53,7 +53,7 @@
                                 </form>
 
                                 <% if (home.rulesUrl) { %>
-                                    <a href="<%= home.rulesUrl %>" target="_blank" class="ml-auto text-sm text-indigo-600 hover:underline">View rules</a>
+                                    <a href="/rules/<%= home.rulesUrl %>" target="_blank" class="ml-auto text-sm text-indigo-600 hover:underline">View rules</a>
                                 <% } %>
                             </div>
                         </div>

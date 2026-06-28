@@ -18,8 +18,12 @@ const homeSchema= mongoose.Schema({
         required: true
     },
     photo: String,
+    photoBuffer: Buffer,
+    photoMimeType: String,
     description: String,
     rules: String,
+    rulesBuffer: Buffer,
+    rulesMimeType: String,
 });
 
 // This is used to delete favourites while deleting homes...
