@@ -23,7 +23,7 @@
                     </li>
                 <% } else { %>
                     <li>
-                        <a href="/host/host-home-list" class="px-4 py-2 rounded-md transition <%= currentPage === 'host-homes' ? 'bg-red-500 text-white' : 'text-gray-700 hover:bg-gray-100' %>">Host Home</a>
+                        <a href="/host/host-home-list" class="px-4 py-2 rounded-md transition <%= (currentPage === 'host-homes' || currentPage === 'my-homes') ? 'bg-red-500 text-white' : 'text-gray-700 hover:bg-gray-100' %>">My Homes</a>
                     </li>
                     <li>
                         <a href="/host/add-home" class="px-4 py-2 rounded-md transition <%= currentPage === 'addHome' ? 'bg-red-500 text-white' : 'text-gray-700 hover:bg-gray-100' %>">Add Home</a>

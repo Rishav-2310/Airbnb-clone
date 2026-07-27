@@ -22,6 +22,10 @@ const userSchema= mongoose.Schema({
     favourites: [{  // Array of ObjectIds referencing the Home model
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Home'
+    }],
+    myHomes: [{  // Array of ObjectIds referencing the Home model
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Home'
     }]
 });
 

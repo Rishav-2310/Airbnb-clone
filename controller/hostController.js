@@ -1,4 +1,6 @@
 const Home= require('../models/homes');
+const User= require('../models/user');
+
 const fs= require('fs');
 
 const randomString= (length) => {
@@ -40,61 +42,74 @@ exports.getEditHome= (req, res, next) => {
     })
 };
 
-exports.getHostHomes= (req, res, next) => {
-    Home.find().then(registeredHomes => {
+exports.getHostHomes = async (req, res, next) => {
+    try {
+        const userId = req.session.user._id;
+        const user = await User.findById(userId).populate('myHomes');
+        const hostHomes = user ? user.myHomes : [];
         res.render('host/host-home-list', {
-            registeredHomes: registeredHomes, 
-            pageTitle: 'Host Homes List', 
+            registeredHomes: hostHomes, 
+            pageTitle: 'My Homes',  
             currentPage: 'host-homes',
             isLoggedIn: req.isLoggedIn,
             user: req.session.user,
-        })
-    });
+        });
+    } catch (err) {
+        console.log("Error fetching host homes", err);
+        res.redirect('/');
+    }
 }
 
-exports.postAddHome= (req, res, next) => {
-    const {houseName, price, location, rating, description} = req.body;
-    const photoFile = req.files && req.files['photo'] ? req.files['photo'][0] : null;
-    const rulesFile = req.files && req.files['rules'] ? req.files['rules'][0] : null;
-    if(!photoFile) {
-        return res.status(400).send("No image Uploaded");
-    }
-    // const home= new Home({houseName, price, location, rating, photo: photoFile.path, description, rules: rulesFile ? rulesFile.path : ''});
-    // const normalizedPhotoPath = photoFile.path.replace(/\\/g, '/');
-    // const normalizedRulesPath = rulesFile ? rulesFile.path.replace(/\\/g, '/') : '';
-    // const home= new Home({houseName, price, location, rating, photo: normalizedPhotoPath, description, rules: normalizedRulesPath});
-    const photoName = randomString(10) + '-' + photoFile.originalname;
-    const normalizedPhotoPath = 'uploads/' + photoName;
-    
-    let normalizedRulesPath = '';
-    let rulesBuffer = null;
-    let rulesMimeType = '';
-    if (rulesFile) {
-        const rulesName = `rules-${randomString(10)}.pdf`;
-        normalizedRulesPath = 'rules/' + rulesName;
-        rulesBuffer = rulesFile.buffer;
-        rulesMimeType = rulesFile.mimetype;
-    }
+exports.postAddHome = async (req, res, next) => {
+    try {
+        const {houseName, price, location, rating, description} = req.body;
+        const photoFile = req.files && req.files['photo'] ? req.files['photo'][0] : null;
+        const rulesFile = req.files && req.files['rules'] ? req.files['rules'][0] : null;
+        if(!photoFile) {
+            return res.status(400).send("No image Uploaded");
+        }
+        const photoName = randomString(10) + '-' + photoFile.originalname;
+        const normalizedPhotoPath = 'uploads/' + photoName;
+        
+        let normalizedRulesPath = '';
+        let rulesBuffer = null;
+        let rulesMimeType = '';
+        if (rulesFile) {
+            const rulesName = `rules-${randomString(10)}.pdf`;
+            normalizedRulesPath = 'rules/' + rulesName;
+            rulesBuffer = rulesFile.buffer;
+            rulesMimeType = rulesFile.mimetype;
+        }
 
     const home = new Home({
-        houseName,
-        price,
-        location,
-        rating,
-        photo: normalizedPhotoPath,
-        photoBuffer: photoFile.buffer,
-        photoMimeType: photoFile.mimetype,
-        description,
-        rules: normalizedRulesPath,
-        rulesBuffer,
-        rulesMimeType
-    });
-    home.save().then(() => {
+            houseName,
+            price,
+            location,
+            rating,
+            photo: normalizedPhotoPath,
+            photoBuffer: photoFile.buffer,
+            photoMimeType: photoFile.mimetype,
+            description,
+            rules: normalizedRulesPath,
+            rulesBuffer,
+            rulesMimeType
+        });
+        const savedHome = await home.save();
         console.log("Home saved successfully");
-    }).catch(err => {
+    if (req.session.user && req.session.user._id) {
+            const user = await User.findById(req.session.user._id);
+            if (user) {
+                if (!user.myHomes.includes(savedHome._id)) {
+                    user.myHomes.push(savedHome._id);
+                    await user.save();
+                }
+            }
+        }
+        res.redirect('/host/host-home-list');
+    } catch (err) {
         console.log("Error saving home", err);
-    });
     res.redirect('/host/host-home-list');
+    }
 }
 
 exports.postEditHome= (req, res, next) => {
@@ -163,11 +178,17 @@ exports.postEditHome= (req, res, next) => {
     });
 }
 
-exports.postDeleteHome= (req, res, next) => {
-    const homeId= req.params.homeId;
-    Home.findByIdAndDelete(homeId).then(() => {
+exports.postDeleteHome = async (req, res, next) => {
+    try {
+        const homeId = req.params.homeId;
+        await Home.findByIdAndDelete(homeId);
+        await User.updateMany(
+            {},
+            { $pull: { favourites: homeId, myHomes: homeId } }
+        );
         res.redirect('/host/host-home-list');
-    }).catch(err => {
+    } catch (err) {
         console.log("Error while Deleting ", err);
-    })
+    res.redirect('/host/host-home-list');
+    }
 }
