@@ -12,5 +12,8 @@ storeRouter.get('/homes/:homeId', storeController.getHomeDetails);
 storeRouter.post('/favourite-list', storeController.postAddToFavourite);
 storeRouter.post('/homes/delete-favourite/:homeId', storeController.postDeleteFavourite);
 storeRouter.get('/rules/:homeId', storeController.getHouseRules);
+storeRouter.get('/reserve/:homeId', storeController.getReserve);
+storeRouter.post('/reserve/:homeId', storeController.postReserve);
+storeRouter.post('/bookings/cancel/:bookingId', storeController.postCancelBooking);
 
 module.exports= storeRouter;

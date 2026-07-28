@@ -26,7 +26,32 @@ const userSchema= mongoose.Schema({
     myHomes: [{  // Array of ObjectIds referencing the Home model
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Home'
+    }],
+    bookings: [{
+        home: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Home',
+            required: true
+        },
+        checkIn: String,
+        checkOut: String,
+        guests: {
+            adults: { type: Number, default: 1 },
+            children: { type: Number, default: 0 },
+            infants: { type: Number, default: 0 },
+            pets: { type: Boolean, default: false }
+        },
+        totalNights: Number,
+        totalPrice: Number,
+        paymentMethod: String,
+        specialRequests: String,
+        addOns: [String],
+        createdAt: {
+            type: Date,
+            default: Date.now
+        }
     }]
 });
+
 
 module.exports= mongoose.model('User', userSchema);

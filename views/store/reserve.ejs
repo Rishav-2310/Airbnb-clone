@@ -1,0 +1,750 @@
+<%- include('../partials/head') %>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col font-sans antialiased">
+    <%- include('../partials/nav') %>
+    <% if (user && user.userType === 'guest') { %>
+        <main class="grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10">
+            <!-- Top Navigation / Breadcrumbs -->
+            <div class="mb-6 flex items-center justify-between">
+                <a href="/homes/<%= home._id %>" class="inline-flex items-center text-sm font-medium text-gray-600 hover:text-red-500 transition group">
+                    <svg class="w-5 h-5 mr-1.5 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Back to listing
+                </a>
+                <div class="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                    <span class="text-red-500">1. Trip details</span>
+                    <span>&bull;</span>
+                    <span class="text-gray-400">2. Payment</span>
+                    <span>&bull;</span>
+                    <span class="text-gray-400">3. Confirmation</span>
+                </div>
+            </div>
+
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-8">Request to book</h1>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+                
+                <!-- Left Column: Interactive Form Controls -->
+                <div class="lg:col-span-7 space-y-8">
+
+                    <form action="/reserve/<%= home._id %>" method="POST" id="reserveForm" class="space-y-8">
+                        <!-- Hidden Form Inputs for Backend Submission -->
+                        <input type="hidden" name="totalNights" id="hiddenTotalNights" value="3">
+                        <input type="hidden" name="totalPrice" id="hiddenTotalPrice" value="0">
+                        <input type="hidden" name="paymentMethod" id="hiddenPaymentMethod" value="Card">
+                        <input type="hidden" name="adults" id="hiddenAdults" value="2">
+                        <input type="hidden" name="children" id="hiddenChildren" value="0">
+                        <input type="hidden" name="infants" id="hiddenInfants" value="0">
+
+                        <!-- Section 1: Trip Dates & Preset Pickers -->
+                        <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200 hover:shadow-md transition">
+                            <div class="flex items-center justify-between mb-5">
+                                <div>
+                                    <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                        <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        Your trip dates
+                                    </h2>
+                                    <p class="text-sm text-gray-500 mt-0.5">Select check-in and check-out dates for your stay</p>
+                                </div>
+                                <span id="nightsBadge" class="bg-red-50 text-red-600 text-xs font-bold px-3 py-1.5 rounded-full border border-red-100">
+                                    3 nights selected
+                                </span>
+                            </div>
+
+                            <!-- Date Inputs -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="space-y-1">
+                                    <label for="checkInDate" class="block text-xs font-bold text-gray-700 uppercase tracking-wider">Check-in Date</label>
+                                    <div class="relative">
+                                        <input type="date" id="checkInDate" name="checkIn" required
+                                            class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-red-500 text-gray-900 font-medium text-sm shadow-sm transition">
+                                    </div>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label for="checkOutDate" class="block text-xs font-bold text-gray-700 uppercase tracking-wider">Check-out Date</label>
+                                    <div class="relative">
+                                        <input type="date" id="checkOutDate" name="checkOut" required
+                                            class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-red-500 text-gray-900 font-medium text-sm shadow-sm transition">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Preset Quick Buttons -->
+                            <div class="mt-4 pt-4 border-t border-gray-100 flex flex-wrap items-center gap-2">
+                                <span class="text-xs text-gray-400 font-medium mr-1">Quick select:</span>
+                                <button type="button" onclick="setQuickDates(2)" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-gray-200 hover:border-red-500 hover:bg-red-50 hover:text-red-600 transition">
+                                    ⚡ Weekend (2 nights)
+                                </button>
+                                <button type="button" onclick="setQuickDates(3)" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-gray-200 hover:border-red-500 hover:bg-red-50 hover:text-red-600 transition">
+                                    🌟 Long Weekend (3 nights)
+                                </button>
+                                <button type="button" onclick="setQuickDates(7)" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-gray-200 hover:border-red-500 hover:bg-red-50 hover:text-red-600 transition">
+                                    🌴 1 Week (7 nights)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Section 2: Interactive Guests Count -->
+                        <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200 hover:shadow-md transition">
+                            <div class="flex items-center justify-between mb-5">
+                                <div>
+                                    <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                        <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                        Guests & Traveling Party
+                                    </h2>
+                                    <p class="text-sm text-gray-500 mt-0.5" id="guestSummaryText">2 adults</p>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4 divide-y divide-gray-100">
+                                <!-- Adults Counter -->
+                                <div class="pt-3 first:pt-0 flex items-center justify-between">
+                                    <div>
+                                        <div class="font-semibold text-gray-900">Adults</div>
+                                        <div class="text-xs text-gray-500">Age 13 or above</div>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <button type="button" onclick="adjustGuest('adults', -1)" id="adultsMinus"
+                                                class="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-red-500 hover:text-red-500 disabled:opacity-40 disabled:hover:border-gray-300 disabled:hover:text-gray-600 transition">
+                                            &minus;
+                                        </button>
+                                        <span id="adultsVal" class="font-bold text-gray-900 w-6 text-center">2</span>
+                                        <button type="button" onclick="adjustGuest('adults', 1)" id="adultsPlus"
+                                                class="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-red-500 hover:text-red-500 transition">
+                                            &#43;
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Children Counter -->
+                                <div class="pt-4 flex items-center justify-between">
+                                    <div>
+                                        <div class="font-semibold text-gray-900">Children</div>
+                                        <div class="text-xs text-gray-500">Ages 2–12</div>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <button type="button" onclick="adjustGuest('children', -1)" id="childrenMinus"
+                                                class="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-red-500 hover:text-red-500 disabled:opacity-40 disabled:hover:border-gray-300 disabled:hover:text-gray-600 transition">
+                                            &minus;
+                                        </button>
+                                        <span id="childrenVal" class="font-bold text-gray-900 w-6 text-center">0</span>
+                                        <button type="button" onclick="adjustGuest('children', 1)" id="childrenPlus"
+                                                class="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-red-500 hover:text-red-500 transition">
+                                            &#43;
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Infants Counter -->
+                                <div class="pt-4 flex items-center justify-between">
+                                    <div>
+                                        <div class="font-semibold text-gray-900">Infants</div>
+                                        <div class="text-xs text-gray-500">Under 2 years</div>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <button type="button" onclick="adjustGuest('infants', -1)" id="infantsMinus"
+                                                class="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-red-500 hover:text-red-500 disabled:opacity-40 disabled:hover:border-gray-300 disabled:hover:text-gray-600 transition">
+                                            &minus;
+                                        </button>
+                                        <span id="infantsVal" class="font-bold text-gray-900 w-6 text-center">0</span>
+                                        <button type="button" onclick="adjustGuest('infants', 1)" id="infantsPlus"
+                                                class="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-red-500 hover:text-red-500 transition">
+                                            &#43;
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Pets Toggle -->
+                                <div class="pt-4 flex items-center justify-between">
+                                    <div>
+                                        <div class="font-semibold text-gray-900 flex items-center gap-1.5">
+                                            Bringing a pet?
+                                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">Optional</span>
+                                        </div>
+                                        <div class="text-xs text-gray-500">Service animals or domestic pets</div>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" name="pets" id="petsCheckbox" class="sr-only peer" onchange="calculatePrice()">
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 3: Add-on Services & Enhancements -->
+                        <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200 hover:shadow-md transition">
+                            <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2 mb-1">
+                                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                                Optional Add-ons & Services
+                            </h2>
+                            <p class="text-sm text-gray-500 mb-5">Tailor your stay with convenient extra amenities</p>
+
+                            <div class="space-y-3">
+                                <label class="flex items-center justify-between p-3.5 rounded-xl border border-gray-200 hover:border-red-300 hover:bg-red-50/40 cursor-pointer transition">
+                                    <div class="flex items-center space-x-3">
+                                        <input type="checkbox" name="addOns" value="Early Check-in (12:00 PM)" onchange="calculatePrice()" class="w-4 h-4 text-red-500 rounded border-gray-300 focus:ring-red-500">
+                                        <div>
+                                            <span class="text-sm font-semibold text-gray-900">Early Check-in (12:00 PM)</span>
+                                            <p class="text-xs text-gray-500">Subject to host availability</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-bold text-green-600 bg-green-50 px-2.5 py-1 rounded-full">FREE</span>
+                                </label>
+
+                                <label class="flex items-center justify-between p-3.5 rounded-xl border border-gray-200 hover:border-red-300 hover:bg-red-50/40 cursor-pointer transition">
+                                    <div class="flex items-center space-x-3">
+                                        <input type="checkbox" name="addOns" value="Airport Shuttle Pickup" data-price="600" onchange="calculatePrice()" class="w-4 h-4 text-red-500 rounded border-gray-300 focus:ring-red-500">
+                                        <div>
+                                            <span class="text-sm font-semibold text-gray-900">Airport Pickup & Shuttle</span>
+                                            <p class="text-xs text-gray-500">Private vehicle pickup directly to property</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-sm font-bold text-gray-900">+Rs 600</span>
+                                </label>
+
+                                <label class="flex items-center justify-between p-3.5 rounded-xl border border-gray-200 hover:border-red-300 hover:bg-red-50/40 cursor-pointer transition">
+                                    <div class="flex items-center space-x-3">
+                                        <input type="checkbox" name="addOns" value="Daily Gourmet Breakfast" data-price-per-night="350" onchange="calculatePrice()" class="w-4 h-4 text-red-500 rounded border-gray-300 focus:ring-red-500">
+                                        <div>
+                                            <span class="text-sm font-semibold text-gray-900">Daily Gourmet Breakfast</span>
+                                            <p class="text-xs text-gray-500">Fresh organic breakfast delivered daily</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-sm font-bold text-gray-900">+Rs 350 <span class="text-xs font-normal text-gray-500">/ night</span></span>
+                                </label>
+
+                                <label class="flex items-center justify-between p-3.5 rounded-xl border border-gray-200 hover:border-red-300 hover:bg-red-50/40 cursor-pointer transition">
+                                    <div class="flex items-center space-x-3">
+                                        <input type="checkbox" name="addOns" value="Airbnb Protection Guarantee" data-price="250" onchange="calculatePrice()" class="w-4 h-4 text-red-500 rounded border-gray-300 focus:ring-red-500">
+                                        <div>
+                                            <span class="text-sm font-semibold text-gray-900">Trip Cancellation Protection</span>
+                                            <p class="text-xs text-gray-500">Full refund if cancelled up to 24h prior</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-sm font-bold text-gray-900">+Rs 250</span>
+                                </label>
+                            </div>
+
+                            <!-- Special Request Box -->
+                            <div class="mt-5 pt-4 border-t border-gray-100">
+                                <label for="specialRequests" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Message or Special Requests to Host</label>
+                                <textarea id="specialRequests" name="specialRequests" rows="3"
+                                        placeholder="Let the host know if you have specific arrival times, dietary preferences, or questions..."
+                                        class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm text-gray-900 transition placeholder:text-gray-400"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Section 4: Interactive Payment Methods -->
+                        <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200 hover:shadow-md transition">
+                            <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2 mb-1">
+                                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                Pay with
+                            </h2>
+                            <p class="text-sm text-gray-500 mb-5">Choose your preferred payment method</p>
+
+                            <!-- Payment Tab Nav Buttons -->
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6 p-1.5 bg-gray-100 rounded-xl">
+                                <button type="button" onclick="selectPaymentTab('Card')" id="tabCard"
+                                        class="py-2.5 px-3 text-xs sm:text-sm font-semibold rounded-lg transition bg-white text-gray-900 shadow-sm">
+                                    💳 Card
+                                </button>
+                                <button type="button" onclick="selectPaymentTab('UPI')" id="tabUPI"
+                                        class="py-2.5 px-3 text-xs sm:text-sm font-semibold rounded-lg transition text-gray-600 hover:text-gray-900">
+                                    📱 UPI / GPay
+                                </button>
+                                <button type="button" onclick="selectPaymentTab('NetBanking')" id="tabNetBanking"
+                                        class="py-2.5 px-3 text-xs sm:text-sm font-semibold rounded-lg transition text-gray-600 hover:text-gray-900">
+                                    🏦 Banking
+                                </button>
+                                <button type="button" onclick="selectPaymentTab('PayAtProperty')" id="tabPayAtProperty"
+                                        class="py-2.5 px-3 text-xs sm:text-sm font-semibold rounded-lg transition text-gray-600 hover:text-gray-900">
+                                    💵 Pay Later
+                                </button>
+                            </div>
+
+                            <!-- Card View Form -->
+                            <div id="paymentContentCard" class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Cardholder Name</label>
+                                    <input type="text" placeholder="<%= user ? user.firstName + ' ' + (user.lastName || '') : 'Full Name' %>"
+                                        class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Card Number</label>
+                                    <div class="relative">
+                                        <input type="text" id="cardNumber" placeholder="4532 &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 8892" maxlength="19"
+                                            oninput="formatCardNumber(this)"
+                                            class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm tracking-widest">
+                                        <div class="absolute right-3 top-3 flex items-center space-x-1.5 text-xs text-gray-400 font-bold">
+                                            <span class="bg-blue-600 text-white px-1.5 py-0.5 rounded text-[10px]">VISA</span>
+                                            <span class="bg-red-500 text-white px-1.5 py-0.5 rounded text-[10px]">MC</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Expiration</label>
+                                        <input type="text" placeholder="MM / YY" maxlength="5"
+                                            class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">CVV Code</label>
+                                        <input type="password" placeholder="123" maxlength="4"
+                                            class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- UPI View -->
+                            <div id="paymentContentUPI" class="hidden space-y-4">
+                                <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-xs text-blue-800 flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Instant UPI checkout supported via Google Pay, PhonePe, Paytm, and BHIM.
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Enter your Virtual Payment Address (VPA)</label>
+                                    <div class="flex gap-2">
+                                        <input type="text" placeholder="yourname@upi / mobile@okaxis"
+                                            class="grow px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-red-500 text-sm">
+                                        <button type="button" onclick="alert('VPA Verified! You will receive a collect request upon clicking Confirm.')" class="px-4 py-3 bg-gray-900 hover:bg-black text-white text-xs font-bold rounded-xl transition">
+                                            Verify VPA
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Net Banking View -->
+                            <div id="paymentContentNetBanking" class="hidden space-y-4">
+                                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Select Bank</label>
+                                <select class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-red-500 text-sm">
+                                    <option value="HDFC">HDFC Bank</option>
+                                    <option value="SBI">State Bank of India (SBI)</option>
+                                    <option value="ICICI">ICICI Bank</option>
+                                    <option value="AXIS">Axis Bank</option>
+                                    <option value="KOTAK">Kotak Mahindra Bank</option>
+                                </select>
+                            </div>
+
+                            <!-- Pay At Property View -->
+                            <div id="paymentContentPayAtProperty" class="hidden space-y-3">
+                                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-800">
+                                    <span class="font-bold block mb-1">Pay on Arrival Guaranteed</span>
+                                    Reserve now without immediate online charge. Pay the full balance directly to host during check-in.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 5: Ground Rules & Terms Confirmation -->
+                        <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200">
+                            <h3 class="font-bold text-gray-900 text-base mb-3">Required for your stay</h3>
+                            <ul class="text-xs text-gray-600 space-y-2 mb-5 list-disc list-inside">
+                                <li>Follow the host's house rules: No smoking indoors & respect quiet hours (10:00 PM – 7:00 AM).</li>
+                                <li>Treat the property with care and report any damages promptly.</li>
+                                <% if (home.rules) { %>
+                                    <li class="list-none pt-1">
+                                        <a href="/rules/<%= home._id %>" class="inline-flex items-center text-blue-600 hover:underline font-semibold">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l.414.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            </svg>
+                                            Download Official House Rules PDF
+                                        </a>
+                                    </li>
+                                <% } %>
+                            </ul>
+
+                            <div class="border-t border-gray-100 pt-4 flex items-center space-x-3">
+                                <input type="checkbox" id="agreeTerms" required class="w-4 h-4 text-red-500 rounded border-gray-300 focus:ring-red-500">
+                                <label for="agreeTerms" class="text-xs text-gray-600">
+                                    I agree to the <span class="font-semibold text-gray-800">House Rules</span>, safety guidelines, and Airbnb guest policies.
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Primary Action Button -->
+                        <div>
+                            <button type="submit" id="submitBtn"
+                                    class="w-full py-4 px-6 rounded-2xl bg-linear-to-r from-rose-500 via-red-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white font-extrabold text-lg shadow-lg hover:shadow-xl transform active:scale-[0.99] transition-all flex items-center justify-center space-x-2">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span id="submitBtnText">Confirm and Pay (Rs 0)</span>
+                            </button>
+                            <p class="text-center text-xs text-gray-400 mt-3 flex items-center justify-center gap-1">
+                                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                                256-Bit SSL Encrypted & AirCover Protected Checkout
+                            </p>
+                        </div>
+                    </form>
+
+                </div>
+
+                <!-- Right Column: Sticky Summary & Real-Time Price Calculator Card -->
+                <div class="lg:col-span-5 lg:sticky lg:top-8">
+                    <div class="bg-white rounded-3xl p-6 sm:p-7 shadow-xl border border-gray-200 space-y-6">
+                        
+                        <!-- Property Image & Title Box -->
+                        <div class="flex gap-4 items-center">
+                            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden bg-gray-100 shrink-0 border border-gray-200">
+                                <img src="/<%= home.photo %>" alt="<%= home.houseName %>" class="w-full h-full object-cover">
+                            </div>
+                            <div class="space-y-1">
+                                <span class="text-[11px] font-bold tracking-wider text-red-500 uppercase">Entire Home</span>
+                                <h3 class="font-bold text-gray-900 text-lg sm:text-xl leading-tight"><%= home.houseName %></h3>
+                                <p class="text-xs text-gray-500 flex items-center">
+                                    <svg class="w-3.5 h-3.5 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    </svg>
+                                    <%= home.location %>
+                                </p>
+                                <div class="flex items-center text-xs font-semibold text-gray-700 pt-1">
+                                    <svg class="w-4 h-4 text-yellow-400 mr-1 fill-current" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <%= home.rating || '4.95' %> <span class="text-gray-400 font-normal ml-1">(Superhost)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-gray-100 pt-5">
+                            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">AirCover Protection</div>
+                            <p class="text-xs text-gray-600 leading-relaxed">
+                                Your booking includes free protection from Host cancellations, listing inaccuracies, and check-in issues.
+                            </p>
+                        </div>
+
+                        <!-- Promo Code Box -->
+                        <div class="border-t border-gray-100 pt-5">
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Have a Promo / Voucher Code?</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="promoInput" placeholder="Try AIRBNB10 or WELCOME500"
+                                    class="grow px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs font-semibold uppercase tracking-wider focus:ring-2 focus:ring-red-500">
+                                <button type="button" onclick="applyPromoCode()" class="px-4 py-2.5 bg-gray-900 hover:bg-black text-white text-xs font-bold rounded-xl transition">
+                                    Apply
+                                </button>
+                            </div>
+                            <div id="promoFeedback" class="text-xs mt-2 hidden font-semibold"></div>
+                        </div>
+
+                        <!-- Price Itemization Breakdown -->
+                        <div class="border-t border-gray-100 pt-5 space-y-3">
+                            <h4 class="font-bold text-gray-900 text-base">Price Details</h4>
+                            
+                            <div class="flex justify-between text-sm text-gray-600">
+                                <span>Rs <%= home.price %> &times; <span id="calcNights">3</span> nights</span>
+                                <span class="font-semibold text-gray-900" id="calcBasePrice">Rs 0</span>
+                            </div>
+
+                            <div class="flex justify-between text-sm text-gray-600">
+                                <span>Cleaning fee</span>
+                                <span class="font-semibold text-gray-900" id="calcCleaningFee">Rs 450</span>
+                            </div>
+
+                            <div class="flex justify-between text-sm text-gray-600">
+                                <span>Airbnb service fee (8%)</span>
+                                <span class="font-semibold text-gray-900" id="calcServiceFee">Rs 0</span>
+                            </div>
+
+                            <div class="flex justify-between text-sm text-gray-600" id="addOnRow">
+                                <span>Selected Add-ons</span>
+                                <span class="font-semibold text-gray-900" id="calcAddOns">Rs 0</span>
+                            </div>
+
+                            <div class="flex justify-between text-sm text-green-600" id="discountRow">
+                                <span class="font-medium flex items-center">
+                                    Discount (<span id="promoCodeLabel">AIRBNB10</span>)
+                                </span>
+                                <span class="font-bold" id="calcDiscount">-Rs 0</span>
+                            </div>
+
+                            <div class="flex justify-between text-sm text-gray-600">
+                                <span>Taxes & GST (12%)</span>
+                                <span class="font-semibold text-gray-900" id="calcTaxes">Rs 0</span>
+                            </div>
+
+                            <div class="border-t border-gray-200 pt-4 flex justify-between items-center">
+                                <div>
+                                    <div class="text-lg font-black text-gray-900">Total (INR)</div>
+                                    <div class="text-xs text-gray-500">Includes all applicable fees</div>
+                                </div>
+                                <div class="text-2xl font-black text-red-600" id="calcGrandTotal">Rs 0</div>
+                            </div>
+                        </div>
+
+                        <!-- Free Cancellation Badge -->
+                        <div class="bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0 text-green-600">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <div class="text-xs text-green-800 font-medium">
+                                <span class="font-bold block">Free cancellation policy</span>
+                                Cancel before 48 hours of check-in for a full 100% refund.
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- Interactive Client-side Script -->
+        <script>
+            const HOME_BASE_PRICE = parseFloat("<%= home.price %>") || 0;
+            const CLEANING_FEE = 450;
+            
+            let guestCounts = {
+                adults: 2,
+                children: 0,
+                infants: 0
+            };
+
+            let activeDiscountPercent = 0;
+            let activeDiscountFixed = 0;
+            let appliedPromo = null;
+
+            // Initialize default dates
+            document.addEventListener('DOMContentLoaded', () => {
+                const today = new Date();
+                const checkIn = new Date(today);
+                checkIn.setDate(today.getDate() + 1); // Tomorrow
+                
+                const checkOut = new Date(checkIn);
+                checkOut.setDate(checkIn.getDate() + 3); // 3 nights default
+
+                const checkInInput = document.getElementById('checkInDate');
+                const checkOutInput = document.getElementById('checkOutDate');
+
+                checkInInput.min = today.toISOString().split('T')[0];
+                checkInInput.value = checkIn.toISOString().split('T')[0];
+
+                checkOutInput.min = checkIn.toISOString().split('T')[0];
+                checkOutInput.value = checkOut.toISOString().split('T')[0];
+
+                checkInInput.addEventListener('change', () => {
+                    const newCheckIn = new Date(checkInInput.value);
+                    const currentCheckOut = new Date(checkOutInput.value);
+                    if (currentCheckOut <= newCheckIn) {
+                        const nextDay = new Date(newCheckIn);
+                        nextDay.setDate(newCheckIn.getDate() + 1);
+                        checkOutInput.value = nextDay.toISOString().split('T')[0];
+                    }
+                    checkOutInput.min = checkInInput.value;
+                    calculatePrice();
+                });
+
+                checkOutInput.addEventListener('change', () => {
+                    calculatePrice();
+                });
+
+                calculatePrice();
+            });
+
+            // Set preset quick dates
+            function setQuickDates(nights) {
+                const checkInInput = document.getElementById('checkInDate');
+                const checkOutInput = document.getElementById('checkOutDate');
+
+                const checkIn = checkInInput.value ? new Date(checkInInput.value) : new Date();
+                const checkOut = new Date(checkIn);
+                checkOut.setDate(checkIn.getDate() + nights);
+
+                checkOutInput.value = checkOut.toISOString().split('T')[0];
+                calculatePrice();
+            }
+
+            // Guest count adjusters
+            function adjustGuest(type, delta) {
+                if (type === 'adults') {
+                    if (guestCounts.adults + delta >= 1 && guestCounts.adults + delta <= 10) {
+                        guestCounts.adults += delta;
+                    }
+                } else if (type === 'children') {
+                    if (guestCounts.children + delta >= 0 && guestCounts.children + delta <= 6) {
+                        guestCounts.children += delta;
+                    }
+                } else if (type === 'infants') {
+                    if (guestCounts.infants + delta >= 0 && guestCounts.infants + delta <= 4) {
+                        guestCounts.infants += delta;
+                    }
+                }
+                updateGuestUI();
+            }
+
+            function updateGuestUI() {
+                document.getElementById('adultsVal').innerText = guestCounts.adults;
+                document.getElementById('childrenVal').innerText = guestCounts.children;
+                document.getElementById('infantsVal').innerText = guestCounts.infants;
+
+                document.getElementById('hiddenAdults').value = guestCounts.adults;
+                document.getElementById('hiddenChildren').value = guestCounts.children;
+                document.getElementById('hiddenInfants').value = guestCounts.infants;
+
+                document.getElementById('adultsMinus').disabled = guestCounts.adults <= 1;
+                document.getElementById('childrenMinus').disabled = guestCounts.children <= 0;
+                document.getElementById('infantsMinus').disabled = guestCounts.infants <= 0;
+
+                let summary = `${guestCounts.adults} adult${guestCounts.adults > 1 ? 's' : ''}`;
+                if (guestCounts.children > 0) {
+                    summary += `, ${guestCounts.children} child${guestCounts.children > 1 ? 'ren' : ''}`;
+                }
+                if (guestCounts.infants > 0) {
+                    summary += `, ${guestCounts.infants} infant${guestCounts.infants > 1 ? 's' : ''}`;
+                }
+                document.getElementById('guestSummaryText').innerText = summary;
+            }
+
+            // Tab payment selector
+            function selectPaymentTab(method) {
+                const tabs = ['Card', 'UPI', 'NetBanking', 'PayAtProperty'];
+                tabs.forEach(t => {
+                    const tabBtn = document.getElementById('tab' + t);
+                    const tabContent = document.getElementById('paymentContent' + t);
+
+                    if (t === method) {
+                        tabBtn.className = "py-2.5 px-3 text-xs sm:text-sm font-semibold rounded-lg transition bg-white text-gray-900 shadow-sm";
+                        tabContent.classList.remove('hidden');
+                    } else {
+                        tabBtn.className = "py-2.5 px-3 text-xs sm:text-sm font-semibold rounded-lg transition text-gray-600 hover:text-gray-900";
+                        tabContent.classList.add('hidden');
+                    }
+                });
+                document.getElementById('hiddenPaymentMethod').value = method;
+            }
+
+            // Format Card Input spacing
+            function formatCardNumber(input) {
+                let val = input.value.replace(/\D/g, '');
+                let formatted = val.match(/.{1,4}/g)?.join(' ') || val;
+                input.value = formatted;
+            }
+
+            // Apply Promo Code
+            function applyPromoCode() {
+                const input = document.getElementById('promoInput');
+                const feedback = document.getElementById('promoFeedback');
+                const code = input.value.trim().toUpperCase();
+
+                if (code === 'AIRBNB10') {
+                    activeDiscountPercent = 0.10;
+                    activeDiscountFixed = 0;
+                    appliedPromo = 'AIRBNB10 (10% Off)';
+                    feedback.className = "text-xs mt-2 font-semibold text-green-600";
+                    feedback.innerText = "✓ Code AIRBNB10 applied! 10% discount added.";
+                } else if (code === 'WELCOME500') {
+                    activeDiscountPercent = 0;
+                    activeDiscountFixed = 500;
+                    appliedPromo = 'WELCOME500 (Rs 500 Off)';
+                    feedback.className = "text-xs mt-2 font-semibold text-green-600";
+                    feedback.innerText = "✓ Code WELCOME500 applied! Rs 500 discount added.";
+                } else if (code === 'SUPERHOST') {
+                    activeDiscountPercent = 0.15;
+                    activeDiscountFixed = 0;
+                    appliedPromo = 'SUPERHOST (15% Off)';
+                    feedback.className = "text-xs mt-2 font-semibold text-green-600";
+                    feedback.innerText = "✓ Superhost discount applied! 15% off.";
+                } else {
+                    feedback.className = "text-xs mt-2 font-semibold text-red-500";
+                    feedback.innerText = "✕ Invalid promo code. Try AIRBNB10 or WELCOME500.";
+                    activeDiscountPercent = 0;
+                    activeDiscountFixed = 0;
+                    appliedPromo = null;
+                }
+                feedback.classList.remove('hidden');
+                calculatePrice();
+            }
+
+            // Calculate Real-Time Dynamic Price
+            function calculatePrice() {
+                const checkInInput = document.getElementById('checkInDate').value;
+                const checkOutInput = document.getElementById('checkOutDate').value;
+
+                let nights = 1;
+                if (checkInInput && checkOutInput) {
+                    const date1 = new Date(checkInInput);
+                    const date2 = new Date(checkOutInput);
+                    const diffTime = date2 - date1;
+                    nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    if (isNaN(nights) || nights < 1) nights = 1;
+                }
+
+                // Update Nights badges
+                document.getElementById('hiddenTotalNights').value = nights;
+                document.getElementById('nightsBadge').innerText = `${nights} night${nights > 1 ? 's' : ''} selected`;
+                document.getElementById('calcNights').innerText = nights;
+
+                // Calculate Base Price
+                const basePrice = HOME_BASE_PRICE * nights;
+                document.getElementById('calcBasePrice').innerText = `Rs ${basePrice.toLocaleString('en-IN')}`;
+
+                // Calculate Add-ons
+                let addOnsTotal = 0;
+                const addOnBoxes = document.querySelectorAll('input[name="addOns"]:checked');
+                addOnBoxes.forEach(box => {
+                    if (box.dataset.price) {
+                        addOnsTotal += parseFloat(box.dataset.price);
+                    }
+                    if (box.dataset.pricePerNight) {
+                        addOnsTotal += parseFloat(box.dataset.pricePerNight) * nights;
+                    }
+                });
+
+                document.getElementById('calcAddOns').innerText = `Rs ${addOnsTotal.toLocaleString('en-IN')}`;
+
+                // Calculate Service Fee (8% of base price)
+                const serviceFee = Math.round(basePrice * 0.08);
+                document.getElementById('calcServiceFee').innerText = `Rs ${serviceFee.toLocaleString('en-IN')}`;
+
+                // Calculate Discount
+                let discountAmount = 0;
+                if (activeDiscountPercent > 0) {
+                    discountAmount = Math.round(basePrice * activeDiscountPercent);
+                } else if (activeDiscountFixed > 0) {
+                    discountAmount = activeDiscountFixed;
+                }
+
+                const discountRow = document.getElementById('discountRow');
+                if (discountAmount > 0) {
+                    discountRow.classList.remove('hidden');
+                    document.getElementById('promoCodeLabel').innerText = appliedPromo || 'PROMO';
+                    document.getElementById('calcDiscount').innerText = `-Rs ${discountAmount.toLocaleString('en-IN')}`;
+                } else {
+                    discountRow.classList.add('hidden');
+                }
+
+                // Subtotal before tax
+                const subtotal = Math.max(0, basePrice + CLEANING_FEE + serviceFee + addOnsTotal - discountAmount);
+
+                // Taxes (12%)
+                const taxes = Math.round(subtotal * 0.12);
+                document.getElementById('calcTaxes').innerText = `Rs ${taxes.toLocaleString('en-IN')}`;
+
+                // Grand Total
+                const grandTotal = subtotal + taxes;
+                document.getElementById('calcGrandTotal').innerText = `Rs ${grandTotal.toLocaleString('en-IN')}`;
+                document.getElementById('hiddenTotalPrice').value = grandTotal;
+
+                // Submit Button text
+                document.getElementById('submitBtnText').innerText = `Confirm and Pay (Rs ${grandTotal.toLocaleString('en-IN')})`;
+            }
+        </script>
+    <% } else { %>
+        <p>Please log in as guest to reserve this home.</p>
+    <% } %>
+</body>
+</html>
