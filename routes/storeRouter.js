@@ -14,6 +14,9 @@ storeRouter.post('/homes/delete-favourite/:homeId', storeController.postDeleteFa
 storeRouter.get('/rules/:homeId', storeController.getHouseRules);
 storeRouter.get('/reserve/:homeId', storeController.getReserve);
 storeRouter.post('/reserve/:homeId', storeController.postReserve);
+storeRouter.get('/profile', storeController.getProfile);
+storeRouter.post('/profile/edit', storeController.postEditProfile);
+storeRouter.post('/profile/change-password', storeController.postEditProfile);
 storeRouter.post('/bookings/cancel/:bookingId', storeController.postCancelBooking);
 
 module.exports= storeRouter;

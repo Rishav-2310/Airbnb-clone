@@ -251,3 +251,95 @@ exports.postCancelBooking = async (req, res, next) => {
         res.redirect('/bookings');
     }
 };
+
+exports.getProfile = async (req, res, next) => {
+    if (!req.isLoggedIn) {
+        return res.redirect('/login');
+    }
+    try {
+        const userId = req.session.user._id;
+        const userProfile = await User.findById(userId)
+            .populate('favourites')
+            .populate('bookings.home')
+            .populate('myHomes');
+        
+        if (!userProfile) {
+            return res.redirect('/login');
+        }
+
+        res.render('store/profile', {
+            userProfile: userProfile,
+            pageTitle: `${userProfile.firstName}'s Profile`,
+            currentPage: 'profile',
+            isLoggedIn: req.isLoggedIn,
+            user: req.session.user,
+            updated: req.query.updated === 'true'
+        });
+    } catch (err) {
+        console.log("Error fetching user profile:", err);
+        res.redirect('/');
+    }
+};
+
+exports.postEditProfile = async (req, res, next) => {
+    if (!req.isLoggedIn) {
+        return res.redirect('/login');
+    }
+    try {
+        const userId = req.session.user._id;
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.redirect('/login');
+        }
+
+        const { firstName, lastName, phone, location, occupation, bio, languages } = req.body;
+
+        // user.firstName = firstName ? firstName.trim() : user.firstName;
+        // user.lastName = lastName ? lastName.trim() : user.lastName;
+        // user.phone = phone ? phone.trim() : user.phone;
+        // user.location = location ? location.trim() : user.location;
+        // user.occupation = occupation ? occupation.trim() : user.occupation;
+        // user.bio = bio ? bio.trim() : user.bio;
+        // user.languages = languages ? languages.trim() : user.languages;
+
+        if (firstName !== undefined && firstName.trim() !== '') {
+            user.firstName = firstName.trim();
+        }
+        if (lastName !== undefined) {
+            user.lastName = lastName.trim();
+        }
+        if (phone !== undefined) {
+            user.phone = phone.trim();
+        }
+        if (location !== undefined) {
+            user.location = location.trim();
+        }
+        if (occupation !== undefined) {
+            user.occupation = occupation.trim();
+        }
+        if (bio !== undefined) {
+            user.bio = bio.trim();
+        }
+        if (languages !== undefined) {
+            user.languages = languages.trim();
+        }
+
+        if (req.files && req.files.profilePic && req.files.profilePic[0]) {
+            const profilePicFile = req.files.profilePic[0];
+            user.profilePicBuffer = profilePicFile.buffer;
+            user.profilePicMimeType = profilePicFile.mimetype;
+            user.profilePic = `/user/avatar/${user._id}`;
+        }
+
+        await user.save();
+
+        req.session.user = JSON.parse(JSON.stringify(user));
+        req.session.save(err => {
+            if (err) console.log("Session save error:", err);
+            return res.redirect('/profile?updated=true');
+        });
+    } catch (err) {
+        console.log("Error updating user profile:", err);
+        res.redirect('/profile');
+    }
+};

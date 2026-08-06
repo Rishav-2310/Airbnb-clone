@@ -50,7 +50,37 @@ const userSchema= mongoose.Schema({
             type: Date,
             default: Date.now
         }
-    }]
+    }],
+    phone: {
+        type: String,
+        default: ''
+    },
+    location: {
+        type: String,
+        default: ''
+    },
+    occupation: {
+        type: String,
+        default: ''
+    },
+    bio: {
+        type: String,
+        default: ''
+    },
+    languages: {
+        type: String,
+        default: ''
+    },
+    profilePic: {
+        type: String,
+        default: ''
+    },
+    profilePicBuffer: Buffer,
+    profilePicMimeType: String,
+    joinedDate: {
+        type: Date,
+        default: Date.now
+    }
 });
 
 

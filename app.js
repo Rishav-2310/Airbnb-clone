@@ -51,8 +51,8 @@ const randomString= (length) => {
 // });
 
 const uploadFileFilter = (req, file, cb) => {
-    if (file.fieldname === 'photo') {
-        if (file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+    if (file.fieldname === 'photo' || file.fieldname === 'profilePic') {
+        if (file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/webp') {
             cb(null, true);
         } else {
             cb(null, false);
@@ -74,6 +74,7 @@ const upload = multer({
     fileFilter: uploadFileFilter
 }).fields([
     { name: 'photo', maxCount: 1 },
+    { name: 'profilePic', maxCount: 1 },
     { name: 'rules', maxCount: 1 }
 ]);
 
@@ -92,6 +93,19 @@ const servePhoto = (req, res, next) => {
         next();
     }).catch(err => next());
 };
+
+const serveProfilePic = (req, res, next) => {
+    const userId = req.params.userId;
+    mongoose.model('User').findById(userId).then(user => {
+        if (user && user.profilePicBuffer) {
+            res.setHeader('Content-Type', user.profilePicMimeType || 'image/jpeg');
+            return res.send(user.profilePicBuffer);
+        }
+        next();
+    }).catch(err => next());
+};
+
+app.get('/user/avatar/:userId', serveProfilePic);
 app.get('/uploads/:filename', servePhoto);
 app.get('/host/uploads/:filename', servePhoto);
 app.get('/homes/uploads/:filename', servePhoto);
