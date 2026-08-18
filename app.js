@@ -17,10 +17,25 @@ const {default: mongoose} = require('mongoose');
 const app= express();
 
 app.set('view engine', 'ejs');  // For using ejs...
-app.set('views', 'views');  // views is name after the folder views if we change that name we aslo have to change the name in this...
+// app.set('views', 'views');  // views is name after the folder views if we change that name we aslo have to change the name in this...
+app.set('views', path.join(rootDir, 'views'));  // absolute path for Vercel serverless environment...
+
+// Serverless DB connection middleware
+app.use(async (req, res, next) => {
+    const mongoUri = process.env.DB_PATH || DB_PATH;
+    if (mongoose.connection.readyState === 0 && mongoUri) {
+        try {
+            await mongoose.connect(mongoUri);
+        } catch (err) {
+            console.error("MongoDB connection error:", err);
+        }
+    }
+    next();
+});
 
 const store= new MongoDBStore({
-    uri: DB_PATH,
+    // uri: DB_PATH,
+    uri: process.env.DB_PATH || DB_PATH,
     collection: 'sessions'
 })
 
@@ -141,13 +156,20 @@ app.use('/host', (req, res, next) => {  // Allows not to access direct through t
 app.use('/host',hostRouter);   // adding /host path add /host on links like /host/add-home...
 app.use(errorsController.page404) // 404 Page...
 
-const PORT= 3001;
+// const PORT= 3001;
+const PORT = process.env.PORT || 3001;
+const mongoUri = process.env.DB_PATH || DB_PATH;
 
-mongoose.connect(DB_PATH).then(() => {
+// mongoose.connect(DB_PATH).then(() => {
+if (!process.env.VERCEL) {
+    mongoose.connect(mongoUri).then(() => {
     app.listen(PORT, () => {
         console.log(`Server running on address http://localhost:${PORT}`);
     });
-})
-.catch(err => {
+}).catch(err => {
         console.log("Error while connecting to Mongo", err);
-});
+    });
+}
+
+module.exports = app;
+
