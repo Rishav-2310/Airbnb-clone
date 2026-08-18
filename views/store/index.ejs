@@ -1,13 +1,13 @@
 <%- include('../partials/head') %>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
     <%- include('../partials/nav') %>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grow w-full">
         <header class="flex items-center justify-between mb-8">
             <div>
                 <h1 class="text-3xl font-extrabold">Welcome to Airbnb</h1>
-                <p class="mt-1 text-sm text-gray-600">Find a place to stay — curated homes from local hosts. Rishav Singh</p>
+                <p class="mt-1 text-sm text-gray-600">Find a place to stay — curated homes from local hosts.</p>
             </div>
         </header>
 
@@ -55,5 +55,7 @@
             </div>
         <% } %>
     </main>
+
+    <%- include('../partials/footer') %>
 </body>
 </html>

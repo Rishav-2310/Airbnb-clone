@@ -1,19 +1,26 @@
 <%- include('partials/head') %>
 </head>
-<body>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
     <%- include('partials/nav') %>
-    <main class="flex justify-center items-center mt-10">
-        <div class="w-6xl grid h-50 place-items-center">
-            <p class="text-7xl text-red-500 font-bold">
+    <main class="flex justify-center items-center py-20 grow w-full">
+        <div class="max-w-xl w-full text-center space-y-4 px-4">
+            <p class="text-8xl text-red-500 font-extrabold tracking-tight">
                 404
             </p>
-            <p class="text-4xl text-gray-500">
+            <p class="text-2xl text-gray-700 font-bold">
                 Oops! Page Not Found
             </p>
-            <button class="text-white bg-red-500 h-10 w-30 rounded">
-                <a href="/">Return to Home</a>
-            </button>
+            <p class="text-sm text-gray-500 max-w-md mx-auto">
+                We can't seem to find the page you're looking for. It might have been moved or deleted.
+            </p>
+            <div class="pt-4">
+                <a href="/" class="inline-block text-white bg-red-500 hover:bg-red-600 px-6 py-2.5 rounded-md font-medium transition shadow-sm">
+                    Return to Home
+                </a>
+            </div>
         </div>
     </main>
+
+    <%- include('partials/footer') %>
 </body>
 </html>

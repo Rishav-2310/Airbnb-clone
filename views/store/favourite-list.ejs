@@ -1,9 +1,9 @@
 <%- include('../partials/head') %>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
     <%- include('../partials/nav') %>
     <% if (user && user.userType === 'guest') { %>
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grow w-full">
             <header class="flex items-center justify-between mb-8">
                 <div>
                     <h1 class="text-3xl font-extrabold">Favourite homes</h1>
@@ -57,7 +57,11 @@
             <% } %>
         </main>
     <% } else { %>
-        <%- include('../partials/errors', { errors: [{ msg: 'Error' }] }) %>
+        <div class="grow">
+            <%- include('../partials/errors', { errors: [{ msg: 'Error' }] }) %>
+        </div>
     <% } %>
+
+    <%- include('../partials/footer') %>
 </body>
 </html>

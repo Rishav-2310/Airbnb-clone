@@ -1,10 +1,10 @@
 <%- include('../partials/head') %>
 
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
     <%- include('../partials/nav') %>
 
-    <main class="flex justify-center py-12 px-4">
+    <main class="flex justify-center py-12 px-4 grow w-full">
         <div class="w-full max-w-4xl bg-white rounded-xl shadow-md overflow-hidden">
             <div class="px-6 py-5 bg-linear-to-r from-red-600 to-red-500">
                 <h2 class="text-white text-2xl md:text-3xl font-semibold"><%= editing ? 'Edit your home' : 'Register your home' %></h2>
@@ -75,5 +75,6 @@
         </div>
     </main>
 
+    <%- include('../partials/footer') %>
 </body>
 </html>

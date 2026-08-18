@@ -1,9 +1,9 @@
 <%- include('../partials/head') %>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
   <%- include('../partials/nav') %>
 
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grow w-full">
     <a href="/" class="inline-flex items-center text-sm text-gray-600 hover:underline mb-6">&larr; Back to listings</a>
 
     <div class="bg-white rounded-lg shadow overflow-hidden">
@@ -69,5 +69,7 @@
       </div>
     </div>
   </main>
+
+  <%- include('../partials/footer') %>
 </body>
 </html>
