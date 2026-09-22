@@ -658,6 +658,12 @@
                     appliedPromo = 'SUPERHOST (15% Off)';
                     feedback.className = "text-xs mt-2 font-semibold text-green-600";
                     feedback.innerText = "✓ Superhost discount applied! 15% off.";
+                } else if (code === 'RISHAV2310') {
+                    activeDiscountPercent = 0.5;
+                    activeDiscountFixed = 0;
+                    appliedPromo = 'RISHAV2310 (50% Off)';
+                    feedback.className = "text-xs mt-2 font-semibold text-green-600";
+                    feedback.innerText = "✓ Code RISHAV2310 applied! 50% discount added.";
                 } else {
                     feedback.className = "text-xs mt-2 font-semibold text-red-500";
                     feedback.innerText = "✕ Invalid promo code. Try AIRBNB10 or WELCOME500.";
